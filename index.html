@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+    <meta content="utf-8" http-equiv="encoding">
+</head>
+<body>
+
+    <script>
+        const DEFAULT_APP = "eurocycle";
+        const DEFAULT_LINK = "https://europecycleroutes.wordpress.com";
+        const LINKS = {
+            "eurocycle": {
+                android: "https://europecycleroutes.wordpress.com",
+                iOS: "https://itunes.apple.com/us/app/eurovelo-offline-cycle-routes-through-europe/id1237812701?ls=1&mt=8",
+                default: "https://europecycleroutes.wordpress.com"
+            }
+        };
+
+        function parseQueryString(query) {
+            if (query.startsWith("?")) query = query.slice(1);
+
+            var vars = query.split("&");
+            var queryString = {};
+            for (var i = 0; i < vars.length; i++) {
+                var pair = vars[i].split("=");
+                // If first entry with this name
+                if (typeof queryString[pair[0]] === "undefined") {
+                    queryString[pair[0]] = decodeURIComponent(pair[1]);
+                    // If second entry with this name
+                } else if (typeof queryString[pair[0]] === "string") {
+                    var arr = [queryString[pair[0]], decodeURIComponent(pair[1])];
+                    queryString[pair[0]] = arr;
+                    // If third or later entry with this name
+                } else {
+                    queryString[pair[0]].push(decodeURIComponent(pair[1]));
+                }
+            }
+            return queryString;
+        }
+
+        // Parse the query string for the app name
+        var parsedQuery = parseQueryString(document.location.search);
+        var appName = parsedQuery.app ? parsedQuery.app : DEFAULT_APP;
+
+        var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        var isAndroid = navigator.userAgent.toLowerCase().indexOf("android") > -1;
+
+        var link = DEFAULT_LINK;
+        if (LINKS[appName]) {
+
+            if (isIOS) {
+                link = LINKS[appName].iOS;
+            } else if (isAndroid) {
+                link = LINKS[appName].android;
+            } else {
+                link = LINKS[appName].default;
+            }
+        }
+
+        window.location = link;
+    </script>
+</body>
+
+</html>
